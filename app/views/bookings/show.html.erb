@@ -1,0 +1,54 @@
+<h1>Booking Details</h1>
+
+<div class="booking-detail">
+  <div class="booking-header">
+    <h2><%= @movie.title %></h2>
+    <span class="booking-status <%= @booking.status %>"><%= @booking.status.titleize %></span>
+  </div>
+  
+  <div class="booking-info">
+    <div class="info-section">
+      <h3>Movie Information</h3>
+      <% if @movie.poster_image_url.present? %>
+        <div class="movie-poster-small">
+          <%= image_tag @movie.poster_image_url, alt: @movie.title, class: "poster-small", onerror: "this.src='/assets/fallback-poster.svg'" %>
+        </div>
+      <% end %>
+      <div class="movie-info">
+        <p><strong>Genre:</strong> <%= @movie.display_genre %></p>
+        <p><strong>Rating:</strong> <%= @movie.rating %></p>
+        <p><strong>Duration:</strong> <%= @movie.duration %> minutes</p>
+        <p><strong>Director:</strong> <%= @movie.director %></p>
+      </div>
+    </div>
+    
+    <div class="info-section">
+      <h3>Showtime Information</h3>
+      <p><strong>Theater:</strong> <%= @theater.name %></p>
+      <p><strong>Location:</strong> <%= @theater.location %></p>
+      <p><strong>Screen:</strong> <%= @booking.showtime.screen.name %></p>
+      <p><strong>Date:</strong> <%= @booking.showtime.start_time.strftime("%A, %B %d, %Y") %></p>
+      <p><strong>Time:</strong> <%= @booking.showtime.start_time.strftime("%I:%M %p") %></p>
+    </div>
+    
+    <div class="info-section">
+      <h3>Booking Information</h3>
+      <p><strong>Booking ID:</strong> #<%= @booking.id %></p>
+      <p><strong>Seats:</strong> <%= @booking.seats.join(', ') %></p>
+      <p><strong>Number of Tickets:</strong> <%= @booking.seats.length %></p>
+      <p><strong>Price per Ticket:</strong> ₹<%= @booking.showtime.price %></p>
+      <p><strong>Total Price:</strong> ₹<%= @booking.total_price %></p>
+      <p><strong>Booking Date:</strong> <%= @booking.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+    </div>
+  </div>
+  
+  <div class="booking-actions">
+    <%= link_to "← Back to My Bookings", bookings_path, class: "btn btn-secondary" %>
+    <% if @booking.pending? %>
+      <%= link_to "Cancel Booking", "#", class: "btn btn-danger", data: { confirm: "Are you sure you want to cancel this booking?" } %>
+    <% end %>
+    <% if @booking.confirmed? %>
+      <%= link_to "📧 View Confirmation Email", "/letter_opener", class: "btn btn-primary", target: "_blank" %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,139 @@
+<h1>Select Seats</h1>
+
+<div class="booking-container">
+  <div class="booking-summary">
+    <h2><%= @movie.title %></h2>
+    <div class="movie-info">
+      <% if @movie.poster_image_url.present? %>
+        <div class="movie-poster-small">
+          <%= image_tag @movie.poster_image_url, alt: @movie.title, class: "poster-small", onerror: "this.src='/assets/fallback-poster.svg'" %>
+        </div>
+      <% end %>
+      <div class="showtime-details">
+        <p><strong>Theater:</strong> <%= @theater.name %></p>
+        <p><strong>Screen:</strong> <%= @showtime.screen.name %></p>
+        <p><strong>Date:</strong> <%= @showtime.start_time.strftime("%A, %B %d, %Y") %></p>
+        <p><strong>Time:</strong> <%= @showtime.start_time.strftime("%I:%M %p") %></p>
+        <p><strong>Price per seat:</strong> ₹<%= @showtime.price %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="seat-selection">
+    <h3>Select Your Seats</h3>
+    <div class="screen">
+      <div class="screen-label">SCREEN</div>
+    </div>
+    
+    <div class="seats-container">
+      <% @showtime.screen.seat_layout.each_slice(10) do |row| %>
+        <div class="seat-row">
+          <div class="row-label"><%= row.first.first %></div>
+          <% row.each do |seat| %>
+            <% is_booked = @showtime.booked_seats.include?(seat) %>
+            <% is_selected = @booking&.seats&.include?(seat) %>
+            <%= content_tag :div, seat, 
+                class: "seat #{'booked' if is_booked} #{'selected' if is_selected}",
+                data: { 
+                  seat: seat,
+                  available: !is_booked ? 'true' : 'false',
+                  price: @showtime.price
+                },
+                onclick: is_booked ? nil : "toggleSeat(this)"
+            %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="seat-legend">
+      <div class="legend-item">
+        <div class="seat available"></div>
+        <span>Available</span>
+      </div>
+      <div class="legend-item">
+        <div class="seat selected"></div>
+        <span>Selected</span>
+      </div>
+      <div class="legend-item">
+        <div class="seat booked"></div>
+        <span>Booked</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="booking-summary">
+    <h3>Booking Summary</h3>
+    <div class="summary-details">
+      <p><strong>Selected Seats:</strong> <span id="selected-seats">None</span></p>
+      <p><strong>Number of Tickets:</strong> <span id="ticket-count">0</span></p>
+      <p><strong>Total Price:</strong> ₹<span id="total-price">0.00</span></p>
+    </div>
+    
+    <!-- Booking Form -->
+<form action="/movies/<%= @movie.id %>/bookings" method="post">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+  <input type="hidden" name="booking[showtime_id]" value="<%= @showtime.id %>">
+  <input type="hidden" name="booking[total_price]" id="hidden-total-price" value="0">
+  <input type="hidden" name="booking[seats]" id="hidden-seats" value="[]">
+  <button type="submit" class="btn btn-primary btn-large" id="proceed-btn" disabled>Proceed to Payment</button>
+</form>
+  </div>
+</div>
+
+<script>
+let selectedSeats = [];
+const maxSeatsPerShowtime = 10;
+
+function toggleSeat(element) {
+  const seat = element.dataset.seat;
+  const available = element.dataset.available === 'true';
+  
+  if (!available) return;
+  
+  if (element.classList.contains('selected')) {
+    element.classList.remove('selected');
+    selectedSeats = selectedSeats.filter(s => s !== seat);
+  } else {
+    if (selectedSeats.length >= maxSeatsPerShowtime) {
+      alert(`Maximum ${maxSeatsPerShowtime} seats allowed per booking`);
+      return;
+    }
+    element.classList.add('selected');
+    selectedSeats.push(seat);
+  }
+  
+  updateBookingSummary();
+}
+
+function updateBookingSummary() {
+  const selectedSeatsElement = document.getElementById('selected-seats');
+  const ticketCountElement = document.getElementById('ticket-count');
+  const totalPriceElement = document.getElementById('total-price');
+  const hiddenSeatsElement = document.getElementById('hidden-seats');
+  const hiddenPriceElement = document.getElementById('hidden-total-price');
+  const proceedBtn = document.getElementById('proceed-btn');
+  
+  if (selectedSeats.length > 0) {
+    selectedSeatsElement.textContent = selectedSeats.join(', ');
+    ticketCountElement.textContent = selectedSeats.length;
+    const totalPrice = selectedSeats.length * <%= @showtime.price %>;
+    totalPriceElement.textContent = totalPrice.toFixed(2);
+    hiddenSeatsElement.value = JSON.stringify(selectedSeats);
+    hiddenPriceElement.value = totalPrice;
+    proceedBtn.disabled = false;
+  } else {
+    selectedSeatsElement.textContent = 'None';
+    ticketCountElement.textContent = '0';
+    totalPriceElement.textContent = '0.00';
+    hiddenSeatsElement.value = '';
+    hiddenPriceElement.value = '0';
+    proceedBtn.disabled = true;
+  }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  updateBookingSummary();
+});
+</script>
