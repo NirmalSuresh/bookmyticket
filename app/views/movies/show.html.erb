@@ -1,0 +1,92 @@
+<div class="movie-detail">
+  <div class="movie-header">
+    <div class="movie-poster-large">
+      <%= image_tag @movie.poster_image_url, alt: @movie.title, class: "poster-large-image", onerror: "this.src='/assets/fallback-poster.svg'" %>
+    </div>
+    <div class="movie-info-large">
+      <h1><%= @movie.title %></h1>
+      <div class="movie-meta-large">
+        <% if @movie.display_genre.present? %>
+          <span class="genre-tag-large"><%= @movie.display_genre %></span>
+        <% end %>
+        <% if @movie.rating.present? %>
+          <span class="rating-tag-large"><%= @movie.rating %></span>
+        <% end %>
+        <% if @movie.language.present? %>
+          <span class="language-tag-large"><%= @movie.language %></span>
+        <% end %>
+        <% if @movie.duration.present? %>
+          <span class="duration-tag-large"><%= @movie.duration %> min</span>
+        <% end %>
+      </div>
+      
+      <div class="movie-details">
+        <% if @movie.release_date %>
+          <p><strong>Release Date:</strong> <%= @movie.release_date.strftime("%B %d, %Y") %></p>
+        <% end %>
+        <% if @movie.director.present? %>
+          <p><strong>Director:</strong> <%= @movie.director %></p>
+        <% end %>
+        <% if @movie.cast.present? %>
+          <p><strong>Cast:</strong> <%= @movie.cast %></p>
+        <% end %>
+      </div>
+      
+      <div class="movie-description-full">
+        <h3>Synopsis</h3>
+        <p><%= @movie.description %></p>
+      </div>
+      
+      <% if @movie.trailer_url.present? || @movie.youtube_trailer_url.present? %>
+        <div class="movie-trailer">
+          <h3>Trailer</h3>
+          <div class="trailer-container">
+            <% youtube_id = @movie.youtube_video_id %>
+            <% if youtube_id.present? %>
+                <script>
+function playVideo(youtubeId) {
+  const thumbnail = document.querySelector('.youtube-thumbnail');
+  const player = document.getElementById('youtube-player-' + youtubeId);
+  
+  if (thumbnail && player) {
+    thumbnail.style.display = 'none';
+    player.style.display = 'block';
+  }
+}
+</script>
+                <div class="youtube-thumbnail" onclick="playVideo('<%= youtube_id %>')">
+                  <img src="https://img.youtube.com/vi/<%= youtube_id %>/maxresdefault.jpg" 
+                       alt="Trailer thumbnail" 
+                       onerror="this.src='https://img.youtube.com/vi/<%= youtube_id %>/hqdefault.jpg'">
+                  <div class="play-button">
+                    <svg width="68" height="48" viewBox="0 0 68 48">
+                      <path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="rgba(255,255,255,0.9)"></path>
+                      <path d="M 45,24 27,14 27,34" fill="var(--primary-red)"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div id="youtube-player-<%= youtube_id %>" style="display: none;">
+                  <iframe width="560" height="315" 
+                          src="https://www.youtube.com/embed/<%= youtube_id %>?autoplay=1" 
+                          frameborder="0" 
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                          allowfullscreen>
+                  </iframe>
+                </div>
+            <% else %>
+              <p><%= link_to "Watch Trailer", @movie.trailer_url, target: "_blank", rel: "noopener", class: "trailer-link" %></p>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="showtimes-section">
+    <h2>Showtimes</h2>
+    <div class="book-now-section">
+      <%= link_to "Book Now", book_movie_path(@movie), class: "btn btn-primary btn-large" %>
+      <p class="book-now-text">Select your city, theater, date, and time</p>
+    </div>
+  </div>
+</div>

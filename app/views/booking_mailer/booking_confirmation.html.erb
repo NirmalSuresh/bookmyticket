@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Booking Confirmation - BookMyTicket</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+      border-radius: 10px 10px 0 0;
+    }
+    .content {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 0 0 10px 10px;
+    }
+    .booking-details {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #666;
+    }
+    .detail-value {
+      color: #333;
+    }
+    .seats {
+      background: #e8f5e8;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+    .total {
+      font-size: 18px;
+      font-weight: bold;
+      color: #28a745;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #666;
+      font-size: 14px;
+    }
+    .qr-code {
+      text-align: center;
+      margin: 20px 0;
+      padding: 20px;
+      background: white;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎬 Booking Confirmed!</h1>
+    <p>Your tickets have been successfully booked</p>
+  </div>
+  
+  <div class="content">
+    <h2>🎫 Booking Details</h2>
+    
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Booking ID:</span>
+        <span class="detail-value">#<%= @booking.id %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Movie:</span>
+        <span class="detail-value"><%= @movie.title %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Theater:</span>
+        <span class="detail-value"><%= @theater.name %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Screen:</span>
+        <span class="detail-value">Screen <%= @showtime.screen.name %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Date & Time:</span>
+        <span class="detail-value"><%= @showtime.start_time.strftime('%A, %d %B %Y at %I:%M %p') %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Duration:</span>
+        <span class="detail-value"><%= @movie.duration %> minutes</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Language:</span>
+        <span class="detail-value"><%= @movie.language %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Rating:</span>
+        <span class="detail-value"><%= @movie.rating %></span>
+      </div>
+    </div>
+    
+    <div class="seats">
+      <h3>🪑 Seat Numbers</h3>
+      <p><strong><%= @booking.seats.join(', ') %></strong></p>
+      <p><%= @booking.seats.count %> seat(s) booked</p>
+    </div>
+    
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Price per seat:</span>
+        <span class="detail-value">₹<%= @showtime.price %></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Convenience fee:</span>
+        <% base_amount = @showtime.price * @booking.seats.count %>
+        <span class="detail-value">₹<%= (base_amount * 0.02).round(2) %></span>
+      </div>
+      <div class="price-row total">
+        <span>Total Paid:</span>
+        <span>₹<%= @booking.total_price %></span>
+      </div>
+    </div>
+    
+    <div class="qr-code">
+      <h3>📱 Show this QR code at the theater</h3>
+      <p style="font-family: monospace; font-size: 12px; background: #f0f0f0; padding: 10px; border-radius: 5px;">
+        BOOKING-ID-<%= @booking.id %><br>
+        MOVIE-<%= @movie.title.upcase %><br>
+        SEATS-<%= @booking.seats.join('-') %><br>
+        TIME-<%= @showtime.start_time.strftime('%Y%m%d%H%M') %>
+      </p>
+    </div>
+    
+    <div class="footer">
+      <p><strong>Important Instructions:</strong></p>
+      <p>• Please arrive 15 minutes before the showtime</p>
+      <p>• Carry this booking confirmation email or SMS</p>
+      <p>• Outside food and beverages are not allowed</p>
+      <p>• Tickets once booked cannot be exchanged or cancelled</p>
+      <br>
+      <p>Thank you for choosing BookMyTicket! 🎭</p>
+    </div>
+  </div>
+</body>
+</html>

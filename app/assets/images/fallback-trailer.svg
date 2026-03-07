@@ -1,0 +1,6 @@
+<!-- Fallback trailer thumbnail SVG -->
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="315" viewBox="0 0 560 315">
+  <rect width="560" height="315" fill="#34495e"/>
+  <polygon points="240,100 240,215 320,157.5" fill="#e74c3c"/>
+  <text x="280" y="280" text-anchor="middle" fill="#ecf0f1" font-family="Arial, sans-serif" font-size="16">Trailer Not Available</text>
+</svg>

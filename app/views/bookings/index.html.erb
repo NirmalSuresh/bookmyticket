@@ -1,0 +1,34 @@
+<h1>My Bookings</h1>
+
+<% if @bookings.any? %>
+  <div class="bookings-grid">
+    <% @bookings.each do |booking| %>
+      <div class="booking-card">
+        <div class="booking-header">
+          <h3><%= booking.showtime.movie.title %></h3>
+          <span class="booking-status <%= booking.status %>"><%= booking.status.titleize %></span>
+        </div>
+        
+        <div class="booking-details">
+          <p><strong>Theater:</strong> <%= booking.showtime.theater.name %></p>
+          <p><strong>Date & Time:</strong> <%= booking.showtime.start_time.strftime("%B %d, %Y at %I:%M %p") %></p>
+          <p><strong>Screen:</strong> <%= booking.showtime.screen.name %></p>
+          <p><strong>Seats:</strong> <%= booking.seats.join(', ') %></p>
+          <p><strong>Total Price:</strong> ₹<%= booking.total_price %></p>
+        </div>
+        
+        <div class="booking-actions">
+          <%= link_to "View Details", booking_path(booking), class: "btn btn-primary" %>
+          <% if booking.pending? %>
+            <%= link_to "Cancel Booking", "#", class: "btn btn-secondary", data: { confirm: "Are you sure?" } %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <h3>No bookings yet</h3>
+    <p>You haven't made any bookings yet. <%= link_to "Browse movies", root_path %> to get started!</p>
+  </div>
+<% end %>

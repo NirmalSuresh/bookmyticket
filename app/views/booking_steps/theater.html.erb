@@ -1,0 +1,35 @@
+<h1>Book Tickets for <%= @movie.title if @movie.present? %></h1>
+
+<div class="booking-steps">
+  <div class="step-indicator">
+    <div class="step completed">1. Select City</div>
+    <div class="step active">2. Select Theater</div>
+    <div class="step">3. Select Date</div>
+    <div class="step">4. Select Time</div>
+  </div>
+  
+  <div class="step-content">
+    <div class="breadcrumb">
+      City: <%= session[:booking_city] %>
+    </div>
+    
+    <h2>Select Theater</h2>
+    <div class="theaters-grid">
+      <% if @theaters.present? && @theaters.count > 0 %>
+        <% @theaters.each do |theater| %>
+          <a href="/book/<%= @movie.id %>/date?theater_id=<%= theater.id %>" class="theater-card">
+            <div class="theater-name"><%= theater.name %></div>
+            <div class="theater-location"><%= theater.location %></div>
+            <div class="theater-info">
+              <%= theater.screens.count %> screens • 
+              <%= theater.total_capacity %> seats
+            </div>
+          </a>
+        <% end %>
+      <% else %>
+        <p>No theaters found in <%= session[:booking_city] %></p>
+        <p><a href="/book/<%= @movie.id %>">Go back and select another city</a></p>
+      <% end %>
+    </div>
+  </div>
+</div>

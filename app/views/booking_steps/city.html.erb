@@ -1,0 +1,42 @@
+<h1>Book Tickets for <%= @movie.title if @movie.present? %></h1>
+
+<div class="booking-steps">
+  <div class="step-indicator">
+    <div class="step active">1. Select City</div>
+    <div class="step">2. Select Theater</div>
+    <div class="step">3. Select Date</div>
+    <div class="step">4. Select Time</div>
+  </div>
+  
+  <div class="step-content">
+    <h2>Select Your City</h2>
+    
+    <!-- Debug Info -->
+    <div class="debug-info">
+      <h4>Debug Information:</h4>
+      <p><strong>Movie:</strong> <%= @movie.title if @movie.present? %> (ID: <%= @movie.id if @movie.present? %>)</p>
+      <p><strong>Cities Found:</strong> <%= @cities.count if @cities.present? %></p>
+      <p><strong>Cities List:</strong> <%= @cities.inspect if @cities.present? %></p>
+    </div>
+    
+    <div class="cities-grid">
+      <% if @cities.present? && @cities.count > 0 %>
+        <% @cities.each do |city| %>
+          <% if city.present? && @movie.present? %>
+            <a href="/book/<%= @movie.id %>/theater?city=<%= city %>" class="city-card">
+              <div class="city-name"><%= city %></div>
+              <div class="city-theaters">
+                <%= Theater.where("location LIKE ?", "#{city} - %").count %> theaters
+              </div>
+            </a>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="empty-state">
+          <h3>No Cities Available</h3>
+          <p>Please check back later or contact support.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

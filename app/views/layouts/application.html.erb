@@ -6,11 +6,42 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload", "data-timestamp": Time.current.to_i %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <%= yield %>
+    <% unless devise_controller? %>
+      <header>
+        <nav class="navbar">
+          <div class="nav-brand">
+            <%= link_to "BookMyTicket", root_path, class: "brand-link" %>
+          </div>
+          <div class="nav-links">
+            <% if @available_cities.present? %>
+              <%= form_with url: set_city_path, method: :post, local: true, class: "city-selector-form" do %>
+                <%= select_tag :city,
+                    options_for_select(@available_cities, current_city),
+                    onchange: "this.form.submit()",
+                    class: "city-selector" %>
+              <% end %>
+            <% end %>
+            <% if user_signed_in? %>
+              <%= link_to "My Bookings", bookings_path, class: "nav-link" %>
+              <%= link_to "Sign Out", destroy_user_session_path, data: { turbo_method: :delete }, class: "nav-link" %>
+            <% else %>
+              <%= link_to "Sign In", new_user_session_path, class: "nav-link" %>
+              <%= link_to "Sign Up", new_user_registration_path, class: "nav-link" %>
+            <% end %>
+          </div>
+        </nav>
+      </header>
+    <% end %>
+    
+    <main>
+      <p class="notice"><%= notice %></p>
+      <p class="alert"><%= alert %></p>
+      <%= yield %>
+    </main>
   </body>
 </html>

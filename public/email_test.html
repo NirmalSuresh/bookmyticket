@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booking Confirmation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .email-container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { border-bottom: 3px solid #e31e24; padding-bottom: 20px; margin-bottom: 20px; }
+        .movie-title { color: #1a1a1a; font-size: 24px; margin: 0; }
+        .booking-id { color: #666; margin: 5px 0; }
+        .section { margin-bottom: 20px; }
+        .section h3 { color: #e31e24; margin-bottom: 10px; }
+        .details { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .price { color: #28a745; font-weight: bold; font-size: 18px; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1 class="movie-title">🎫 Booking Confirmation</h1>
+            <p class="booking-id">Booking ID: #12345</p>
+        </div>
+        
+        <div class="section">
+            <h3>🎬 Movie Details</h3>
+            <div class="details">
+                <div>
+                    <p><strong>Title:</strong> Test Movie</p>
+                    <p><strong>Language:</strong> English</p>
+                    <p><strong>Rating:</strong> PG-13</p>
+                    <p><strong>Duration:</strong> 150 mins</p>
+                </div>
+                <div>
+                    <p><strong>Theater:</strong> PVR Phoenix Marketcity</p>
+                    <p><strong>Screen:</strong> Screen 1</p>
+                    <p><strong>Date:</strong> Saturday, March 6, 2026</p>
+                    <p><strong>Time:</strong> 06:30 PM</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>🪑 Booking Information</h3>
+            <p><strong>Seats:</strong> <span style="color: #e31e24; font-weight: bold;">A1, A2</span></p>
+            <p><strong>Number of Tickets:</strong> 2</p>
+            <p><strong>Price per Ticket:</strong> ₹250</p>
+            <p><strong>Total Amount:</strong> <span class="price">₹500</span></p>
+        </div>
+        
+        <div class="footer">
+            <p>🎭 Thank you for choosing BookMyTicket!</p>
+            <p>Please arrive 15 minutes before the showtime</p>
+            <p>Outside food and beverages are not allowed</p>
+            <p>Tickets once booked cannot be exchanged or cancelled</p>
+        </div>
+    </div>
+</body>
+</html>
