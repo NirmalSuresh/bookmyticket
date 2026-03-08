@@ -1,0 +1,26 @@
+# AWS App Runner Environment Variables
+RAILS_ENV=production
+RAILS_SERVE_STATIC_FILES=true
+RAILS_MASTER_KEY=your_master_key_here
+
+# Database (use AWS RDS or PostgreSQL addon)
+DATABASE_URL=postgres://user:password@host:5432/bookmyticket_production
+
+# Email (for booking confirmations)
+SMTP_ADDRESS=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+SMTP_DOMAIN=gmail.com
+MAILER_FROM=your_email@gmail.com
+
+# Payment (Razorpay)
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+
+# Live Movie Data
+LIVE_MOVIE_SOURCE=offline_india
+
+# Optional: Add real API keys for live data
+# SERPAPI_KEY=your_serpapi_key
+# OMDB_API_KEY=your_omdb_key

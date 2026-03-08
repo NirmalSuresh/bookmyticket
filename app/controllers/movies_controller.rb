@@ -21,32 +21,13 @@ class MoviesController < ApplicationController
   private
 
   def sync_live_movies_if_needed
-    source = ENV.fetch('LIVE_MOVIE_SOURCE', 'serpapi')
-    return if Movie.where('updated_at >= ?', 6.hours.ago).exists?
-
-    if source == 'serpapi'
-      return unless ENV['SERPAPI_KEY'].present?
-
-      SerpapiSyncService.sync!
-    elsif source == 'tmdb'
-      return unless ENV['TMDB_API_KEY'].present?
-
-      LiveMovieSyncService.sync!
-    else
-      if bms_source_available?
-        BookMyShowSyncService.sync!
-      else
-        OfflineIndiaSyncService.sync!
-      end
-    end
-  rescue StandardError => e
-    Rails.logger.error("Live movie sync failed: #{e.message}")
-    if Movie.joins(:showtimes).where('showtimes.start_time > ?', Time.current).exists?
-      Rails.logger.warn('Using previously synced catalog due to live sync failure')
-    else
-      OfflineIndiaSyncService.sync!
-      Rails.logger.warn('Live sync failed with empty catalog; loaded offline India fallback')
-    end
+    # Disable auto-sync on page load to prevent timeouts
+    # Sync should be run manually or via background job
+    return true if Movie.joins(:showtimes).where('showtimes.start_time > ?', Time.current).exists?
+    
+    # Only use fallback if no movies exist at all
+    OfflineIndiaSyncService.sync!
+    Rails.logger.info('No movies found - loaded offline India fallback')
   end
 
   def bms_source_available?

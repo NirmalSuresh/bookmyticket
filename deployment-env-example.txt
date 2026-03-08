@@ -1,0 +1,44 @@
+# Database
+DATABASE_URL=postgres://bookmyticket:password@rds-endpoint:5432/bookmyticket_production
+
+# Rails
+RAILS_ENV=production
+RAILS_MASTER_KEY=your_master_key_here
+RAILS_SERVE_STATIC_FILES=true
+
+# Email (SMTP)
+SMTP_ADDRESS=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+SMTP_DOMAIN=gmail.com
+SMTP_AUTHENTICATION=plain
+SMTP_ENABLE_STARTTLS_AUTO=true
+MAILER_FROM=your_email@gmail.com
+MAILER_HOST=yourdomain.com
+MAILER_PORT=443
+
+# Payment (Razorpay)
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+
+# Live Movie Data (choose one)
+LIVE_MOVIE_SOURCE=serpapi
+SERPAPI_KEY=your_serpapi_key
+OMDB_API_KEY=your_omdb_key
+SERPAPI_CITIES="mumbai,delhi,bengaluru,hyderabad,chennai,kolkata,pune,ahmedabad,kochi,jaipur"
+SERPAPI_CACHE_TTL_HOURS=6
+SERPAPI_REFRESH_COOLDOWN_MINUTES=30
+
+# Alternative: BookMyShow
+# LIVE_MOVIE_SOURCE=bookmyshow
+# BMS_COOKIE=your_cookie_here
+
+# AWS S3
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_REGION=us-east-1
+S3_BUCKET=bookmyticket-assets-production
+
+# Redis (if using ElastiCache)
+REDIS_URL=redis://your-redis-endpoint:6379/0
