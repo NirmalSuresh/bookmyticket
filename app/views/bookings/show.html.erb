@@ -11,7 +11,7 @@
       <h3>Movie Information</h3>
       <% if @movie.poster_image_url.present? %>
         <div class="movie-poster-small">
-          <%= image_tag @movie.poster_image_url, alt: @movie.title, class: "poster-small", onerror: "this.src='/assets/fallback-poster.svg'" %>
+          <%= image_tag @movie.poster_image_url, alt: @movie.title, class: "poster-small" %>
         </div>
       <% end %>
       <div class="movie-info">

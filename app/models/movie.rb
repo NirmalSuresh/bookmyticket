@@ -20,6 +20,7 @@ class Movie < ApplicationRecord
   def poster_image_url
     return poster_url if poster_url.present?
 
+    # Use data URI fallback for production compatibility
     fallback_poster_data_uri
   end
 

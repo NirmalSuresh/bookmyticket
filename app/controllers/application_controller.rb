@@ -3,6 +3,15 @@ class ApplicationController < ActionController::Base
   before_action :set_location_context
 
   helper_method :current_city
+  
+  layout 'application'
+  
+  def devise_layout
+    if devise_controller?
+      'devise/session'
+    else
+      'application'
+  end
 
   def set_city
     city = params[:city].to_s.strip

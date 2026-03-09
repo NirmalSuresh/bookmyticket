@@ -45,7 +45,7 @@
     <% @movies.each do |movie| %>
       <div class="movie-card">
         <div class="movie-poster">
-          <%= image_tag movie.poster_image_url, alt: movie.title, class: "poster-image", onerror: "this.src='/assets/fallback-poster.svg'" %>
+          <%= image_tag movie.poster_image_url, alt: movie.title, class: "poster-image" %>
         </div>
         
         <div class="movie-info">
