@@ -18,10 +18,10 @@ class Movie < ApplicationRecord
   end
 
   def poster_image_url
-    return poster_url if poster_url.present?
+    return poster_url if poster_url.present? && (poster_url.start_with?('http') || poster_url.start_with?('/'))
 
-    # Use data URI fallback for production compatibility
-    fallback_poster_data_uri
+    title_clean = title.gsub(/[^a-zA-Z0-9\s]/, '').strip
+    "https://via.placeholder.com/300x450/1e40af/ffffff?text=#{ERB::Util.url_encode(title_clean)}"
   end
 
   def youtube_video_id
@@ -51,21 +51,5 @@ class Movie < ApplicationRecord
 
     names = genre.scan(/genre_name\"=>\"([^\"]+)\"/).flatten.uniq
     names.any? ? names.join(', ') : genre
-  end
-
-  private
-
-  def fallback_poster_data_uri
-    title_text = ERB::Util.html_escape(title.to_s.first(28))
-    svg = <<~SVG
-      <svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450">
-        <rect width="300" height="450" fill="#1f2937"/>
-        <rect x="18" y="18" width="264" height="414" rx="12" fill="#111827" stroke="#374151"/>
-        <text x="150" y="210" text-anchor="middle" fill="#f9fafb" font-family="Arial, sans-serif" font-size="16" font-weight="700">Poster Unavailable</text>
-        <text x="150" y="240" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="13">#{title_text}</text>
-      </svg>
-    SVG
-
-    "data:image/svg+xml;utf8,#{CGI.escape(svg)}"
   end
 end

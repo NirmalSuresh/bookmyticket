@@ -11,7 +11,8 @@ class OfflineIndiaSyncService
       rating: 'U/A',
       director: 'Laxman Utekar',
       cast: 'Vicky Kaushal, Rashmika Mandanna',
-      language: 'Hindi'
+      language: 'Hindi',
+      poster_url: '/posters/chhaava.jpg'
     },
     {
       title: 'L2: Empuraan',
@@ -22,7 +23,8 @@ class OfflineIndiaSyncService
       rating: 'U/A',
       director: 'Prithviraj Sukumaran',
       cast: 'Mohanlal, Prithviraj Sukumaran',
-      language: 'Malayalam'
+      language: 'Malayalam',
+      poster_url: '/posters/l2_empuraan.jpg'
     },
     {
       title: 'Sikandar',
@@ -33,7 +35,8 @@ class OfflineIndiaSyncService
       rating: 'U/A',
       director: 'A.R. Murugadoss',
       cast: 'Salman Khan',
-      language: 'Hindi'
+      language: 'Hindi',
+      poster_url: '/posters/sikandar.jpg'
     },
     {
       title: 'Coolie',
@@ -44,7 +47,8 @@ class OfflineIndiaSyncService
       rating: 'U/A',
       director: 'Lokesh Kanagaraj',
       cast: 'Rajinikanth',
-      language: 'Tamil'
+      language: 'Tamil',
+      poster_url: '/posters/coolie.jpg'
     },
     {
       title: 'War 2',
@@ -55,7 +59,8 @@ class OfflineIndiaSyncService
       rating: 'U/A',
       director: 'Ayan Mukerji',
       cast: 'Hrithik Roshan, N. T. Rama Rao Jr.',
-      language: 'Hindi'
+      language: 'Hindi',
+      poster_url: '/posters/war_2.jpg'
     },
     {
       title: 'OG',
@@ -66,7 +71,8 @@ class OfflineIndiaSyncService
       rating: 'A',
       director: 'Sujeeth',
       cast: 'Pawan Kalyan',
-      language: 'Telugu'
+      language: 'Telugu',
+      poster_url: '/posters/og.jpg'
     },
     {
       title: 'Kantara: Chapter 1',
@@ -77,7 +83,8 @@ class OfflineIndiaSyncService
       rating: 'U/A',
       director: 'Rishab Shetty',
       cast: 'Rishab Shetty',
-      language: 'Kannada'
+      language: 'Kannada',
+      poster_url: '/posters/kantara_chapter_1.jpg'
     },
     {
       title: 'Thug Life',
@@ -88,7 +95,8 @@ class OfflineIndiaSyncService
       rating: 'U/A',
       director: 'Mani Ratnam',
       cast: 'Kamal Haasan',
-      language: 'Tamil'
+      language: 'Tamil',
+      poster_url: '/posters/thug_life.jpg'
     }
   ].freeze
 
@@ -110,6 +118,7 @@ class OfflineIndiaSyncService
         director: attrs[:director],
         cast: attrs[:cast],
         language: attrs[:language],
+        poster_url: attrs[:poster_url],
         trailer_url: movie.trailer_url.presence || youtube_search_url(attrs[:title])
       )
       movie.save!
