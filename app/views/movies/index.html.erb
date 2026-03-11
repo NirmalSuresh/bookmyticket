@@ -1,91 +1,57 @@
 <div class="hero-section">
-  <h1 class="hero-title">Book Your Perfect Movie Experience</h1>
-  <p class="hero-subtitle">Discover the latest blockbusters and book your seats instantly</p>
+  <h1 class="hero-title">Now Showing in India</h1>
+  <p class="hero-subtitle">Book tickets for the latest blockbusters in your city</p>
 </div>
 
-<div class="filters">
-  <div class="filter-group">
-    <label for="genre">Genre:</label>
-    <select id="genre" onchange="window.location.href='?genre=' + this.value">
-      <option value="">All Genres</option>
-      <option value="action">Action</option>
-      <option value="comedy">Comedy</option>
-      <option value="drama">Drama</option>
-      <option value="horror">Horror</option>
-      <option value="romance">Romance</option>
-    </select>
+<div class="movies-section">
+  <div class="section-header">
+    <h2 class="section-title">Movies <span>in Theaters</span></h2>
   </div>
-  
-  <div class="filter-group">
-    <label for="rating">Rating:</label>
-    <select id="rating" onchange="window.location.href='?rating=' + this.value">
-      <option value="">All Ratings</option>
-      <option value="U">U</option>
-      <option value="U/A">U/A</option>
-      <option value="A">A</option>
-      <option value="S">S</option>
-    </select>
-  </div>
-  
-  <div class="filter-group">
-    <label for="language">Language:</label>
-    <select id="language" onchange="window.location.href='?language=' + this.value">
-      <option value="">All Languages</option>
-      <option value="hindi">Hindi</option>
-      <option value="english">English</option>
-      <option value="tamil">Tamil</option>
-      <option value="telugu">Telugu</option>
-      <option value="malayalam">Malayalam</option>
-    </select>
-  </div>
-</div>
 
-<% if @movies.any? %>
-  <div class="movies-grid">
-    <% @movies.each do |movie| %>
-      <div class="movie-card">
-        <div class="movie-poster">
-          <%= image_tag movie.poster_image_url, alt: movie.title, class: "poster-image" %>
-        </div>
-        
-        <div class="movie-info">
-          <h3 class="movie-title">
-            <%= link_to movie.title, movie_path(movie) %>
-          </h3>
-          
-          <div class="movie-meta">
-            <% if movie.display_genre.present? %>
-              <span class="genre-tag"><%= movie.display_genre %></span>
+  <% if @movies.any? %>
+    <div class="movies-grid">
+      <% @movies.each do |movie| %>
+        <div class="movie-card">
+          <div class="movie-poster">
+            <% if movie.poster_image_url.present? %>
+              <img src="<%= movie.poster_image_url %>"
+                   alt="<%= movie.title %>"
+                   loading="lazy"
+                   onerror="this.src='https://via.placeholder.com/300x450/12121a/606070?text=No+Poster'">
+            <% else %>
+              <img src="https://via.placeholder.com/300x450/12121a/606070?text=<%= ERB::Util.url_encode(movie.title) %>"
+                   alt="<%= movie.title %>">
             <% end %>
-            
-            <% if movie.rating.present? %>
-              <span class="rating-tag"><%= movie.rating %></span>
-            <% end %>
-            
-            <% if movie.language.present? %>
-              <span class="language-tag"><%= movie.language %></span>
+            <div class="movie-poster-overlay">
+              <%= link_to "Book Now", movie_path(movie), class: "btn btn-primary" %>
+            </div>
+          </div>
+          <div class="movie-info">
+            <h3 class="movie-title">
+              <%= link_to movie.title, movie_path(movie) %>
+            </h3>
+            <div class="movie-badges">
+              <% if movie.genre.present? %>
+                <span class="badge badge-genre"><%= movie.genre.split('/').first %></span>
+              <% end %>
+              <% if movie.rating.present? %>
+                <span class="badge badge-rating"><%= movie.rating %></span>
+              <% end %>
+              <% if movie.language.present? %>
+                <span class="badge badge-lang"><%= movie.language %></span>
+              <% end %>
+            </div>
+            <% if movie.duration.present? && movie.duration > 0 %>
+              <p class="movie-duration"><%= movie.duration %> min</p>
             <% end %>
           </div>
-          
-          <p class="movie-description">
-            <%= movie.description.presence || "Synopsis unavailable for this title." %>
-          </p>
-          
-          <% if movie.release_date.present? %>
-            <p class="movie-release-date">Release: <%= movie.release_date.strftime("%B %d, %Y") %></p>
-          <% end %>
-          
-          <% if movie.duration.present? %>
-            <p class="movie-duration">Duration: <%= movie.duration %> mins</p>
-          <% end %>
-          
-          <% if movie.director.present? %>
-            <p class="movie-director">Director: <%= movie.director %></p>
-          <% end %>
         </div>
-      </div>
-    <% end %>
-  </div>
-<% else %>
-  <p>No movies available.</p>
-<% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <h2>No movies available right now</h2>
+      <p>Check back soon for upcoming releases.</p>
+    </div>
+  <% end %>
+</div>

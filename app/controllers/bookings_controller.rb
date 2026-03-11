@@ -1,7 +1,7 @@
 class BookingsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_showtime, only: [:new, :create]
-  before_action :set_booking, only: [:show, :payment, :payment_success, :payment_failed]
+  before_action :set_booking, only: [:show, :payment, :payment_success, :payment_failed, :cancel]
 
   def index
     @bookings = current_user.bookings.includes(showtime: [:movie, :theater]).order(created_at: :desc)
@@ -63,7 +63,7 @@ class BookingsController < ApplicationController
 
     send_confirmation_email(@booking)
 
-    redirect_to payment_movie_booking_path(@booking.showtime.movie, @booking), notice: 'Payment successful! Booking confirmed.'
+    redirect_to booking_path(@booking), notice: '🎉 Payment successful! Your booking is confirmed.'
   end
 
   def demo_booking
@@ -88,6 +88,19 @@ class BookingsController < ApplicationController
 
   def payment_failed
     redirect_to root_path, alert: 'Payment failed'
+  end
+
+  def cancel
+    if @booking.user != current_user
+      redirect_to bookings_path, alert: 'Not authorized.'
+      return
+    end
+    if @booking.confirmed?
+      redirect_to booking_path(@booking), alert: 'Confirmed bookings cannot be cancelled.'
+      return
+    end
+    @booking.update!(status: 'cancelled')
+    redirect_to bookings_path, notice: "Booking ##{@booking.id} has been cancelled."
   end
 
   private

@@ -519,6 +519,7 @@ class BookMyShowSyncService
     cleaned = url.to_s.strip
     return "https:#{cleaned}" if cleaned.start_with?('//')
     return "https://in.bookmyshow.com#{cleaned}" if cleaned.start_with?('/')
+    return cleaned.sub(/\Ahttp:\/\//, 'https://') if cleaned.start_with?('http://')
 
     cleaned
   end

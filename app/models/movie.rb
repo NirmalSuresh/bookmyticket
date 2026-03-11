@@ -18,10 +18,13 @@ class Movie < ApplicationRecord
   end
 
   def poster_image_url
-    return poster_url if poster_url.present? && (poster_url.start_with?('http') || poster_url.start_with?('/'))
+    if poster_url.present? && (poster_url.start_with?('http') || poster_url.start_with?('/'))
+      # Upgrade OMDB thumbnail to full-size poster
+      return poster_url.gsub(/_SX\d+/, '_SX600').gsub(/_SY\d+/, '_SY900')
+    end
 
     title_clean = title.gsub(/[^a-zA-Z0-9\s]/, '').strip
-    "https://via.placeholder.com/300x450/1e40af/ffffff?text=#{ERB::Util.url_encode(title_clean)}"
+    "https://placehold.co/300x450/1a1a2e/e31e24?text=#{ERB::Util.url_encode(title_clean)}&font=montserrat"
   end
 
   def youtube_video_id
@@ -43,6 +46,12 @@ class Movie < ApplicationRecord
     return nil if youtube_video_id.blank?
 
     "https://www.youtube.com/watch?v=#{youtube_video_id}"
+  end
+
+  def youtube_embed_url
+    return nil if youtube_video_id.blank?
+
+    "https://www.youtube.com/embed/#{youtube_video_id}"
   end
 
   def display_genre

@@ -3,16 +3,25 @@ class BookingStepsController < ApplicationController
 
   def city
     @movie = Movie.find(params[:movie_id])
-    @cities = @movie.showtimes
-                    .joins(:theater)
-                    .where('showtimes.start_time > ?', Time.current)
-                    .where.not(theaters: { city: [nil, ""] })
-                    .distinct
-                    .order('theaters.city')
-                    .pluck('theaters.city')
+    city_aliases = { "Bangalore" => "Bengaluru", "Delhi-NCR" => "Delhi" }
+    raw_cities = @movie.showtimes
+                       .joins(:theater)
+                       .where('showtimes.start_time > ?', Time.current)
+                       .where.not(theaters: { city: [nil, ""] })
+                       .distinct
+                       .order('theaters.city')
+                       .pluck('theaters.city')
+    @cities = raw_cities.map { |c| city_aliases[c] || c }.uniq.sort
+
     if @cities.empty?
-      @cities = Theater.distinct.pluck(:location).map { |loc| loc.to_s.split(' - ').first }.reject(&:blank?).uniq.sort
+      @cities = Theater.distinct.pluck(:city).compact.reject(&:blank?)
+                       .map { |c| city_aliases[c] || c }.uniq.sort
     end
+
+    # Pre-compute theater counts per city to avoid N+1 in view
+    @theater_counts = Theater.group(:city).count
+                              .transform_keys { |k| city_aliases[k] || k }
+                              .each_with_object(Hash.new(0)) { |(k, v), h| h[k] += v }
 
     if current_city.present? && @cities.include?(current_city)
       session[:booking_city] = current_city
@@ -29,8 +38,14 @@ class BookingStepsController < ApplicationController
   def theater
     city = params[:city].presence || current_city
     session[:booking_city] = city
+    # Handle city aliases — DB may store "Bangalore" when user selected "Bengaluru"
+    city_variants = case city
+                    when "Bengaluru" then ["Bengaluru", "Bangalore"]
+                    when "Delhi"     then ["Delhi", "Delhi-NCR"]
+                    else [city]
+                    end
     @theaters = Theater.joins(:showtimes)
-                       .where(city: city, showtimes: { movie_id: @movie.id })
+                       .where(city: city_variants, showtimes: { movie_id: @movie.id })
                        .where('showtimes.start_time > ?', Time.current)
                        .distinct
   end
@@ -43,7 +58,7 @@ class BookingStepsController < ApplicationController
     @available_dates = @theater.showtimes
                               .where(movie: @movie)
                               .where('start_time > ?', Time.current)
-                              .where(start_time: Time.current..7.days.from_now.end_of_day)
+                              .where(start_time: Time.current.beginning_of_day..14.days.from_now.end_of_day)
                               .order(:start_time)
                               .pluck(:start_time)
                               .map(&:to_date)

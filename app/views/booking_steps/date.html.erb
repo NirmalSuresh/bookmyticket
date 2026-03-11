@@ -1,36 +1,20 @@
-<h1>Book Tickets for <%= @movie.title if @movie.present? %></h1>
-
-<div class="booking-steps">
-  <div class="step-indicator">
-    <div class="step completed">1. Select City</div>
-    <div class="step completed">2. Select Theater</div>
-    <div class="step active">3. Select Date</div>
-    <div class="step">4. Select Time</div>
-  </div>
-  
-  <div class="step-content">
-    <div class="breadcrumb">
-      City: <%= session[:booking_city] %> • 
-      Theater: <%= @theater.name if @theater.present? %>
-    </div>
-    
-    <h2>Select Date</h2>
+<div class="step-content">
+  <h2>Select Date</h2>
+  <% if @available_dates.any? %>
     <div class="dates-grid">
-      <% if @available_dates.any? %>
-        <% @available_dates.each do |date| %>
-          <a href="/book/<%= @movie.id %>/time?date=<%= date %>" class="date-card">
-            <div class="date-day"><%= date.strftime('%a') %></div>
-            <div class="date-number"><%= date.day %></div>
-            <div class="date-month"><%= date.strftime('%b') %></div>
-          </a>
-        <% end %>
-      <% else %>
-        <div class="no-showtimes">
-          <h3>No upcoming show dates available</h3>
-          <p>Try a different theater or city.</p>
-          <a href="/book/<%= @movie.id %>/theater?city=<%= session[:booking_city] %>" class="btn btn-secondary">Choose Another Theater</a>
-        </div>
+      <% @available_dates.each do |date| %>
+        <a href="/book/<%= @movie.id %>/time?date=<%= date %>" class="date-card">
+          <div class="date-day"><%= date.strftime('%a') %></div>
+          <div class="date-number"><%= date.day %></div>
+          <div class="date-month"><%= date.strftime('%b') %></div>
+        </a>
       <% end %>
     </div>
-  </div>
+  <% else %>
+    <div class="empty-state">
+      <h3>No upcoming dates available</h3>
+      <p>Try a different theater.</p>
+      <%= link_to "← Back to Theaters", "/book/#{@movie.id}/theater?city=#{session[:booking_city]}", class: "btn btn-secondary" %>
+    </div>
+  <% end %>
 </div>

@@ -1,54 +1,91 @@
-<h1>Booking Details</h1>
+<% fallback_poster = asset_path('fallback-poster.svg') %>
 
-<div class="booking-detail">
-  <div class="booking-header">
-    <h2><%= @movie.title %></h2>
-    <span class="booking-status <%= @booking.status %>"><%= @booking.status.titleize %></span>
+<div class="booking-detail-page">
+
+  <div class="breadcrumb">
+    <%= link_to "My Bookings", bookings_path %> <span class="breadcrumb-sep">›</span> Booking #<%= @booking.id %>
   </div>
-  
-  <div class="booking-info">
-    <div class="info-section">
-      <h3>Movie Information</h3>
-      <% if @movie.poster_image_url.present? %>
-        <div class="movie-poster-small">
-          <%= image_tag @movie.poster_image_url, alt: @movie.title, class: "poster-small" %>
+
+  <div class="booking-detail-header">
+    <div>
+      <h1 class="booking-detail-title"><%= @movie.title %></h1>
+      <span class="status-badge <%= @booking.status %>"><%= @booking.status.titleize %></span>
+    </div>
+  </div>
+
+  <div class="ticket-card">
+    <div class="ticket-header">
+      <%= image_tag(
+        @movie.poster_image_url.presence || fallback_poster,
+        alt: @movie.title,
+        class: "ticket-poster",
+        onerror: "this.onerror=null;this.src='#{fallback_poster}'"
+      ) %>
+      <div class="ticket-movie-info">
+        <h2><%= @movie.title %></h2>
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem">
+          <% if @movie.genre.present? %><span class="badge badge-genre"><%= @movie.genre.split('/').first %></span><% end %>
+          <% if @movie.rating.present? %><span class="badge badge-rating"><%= @movie.rating %></span><% end %>
+          <% if @movie.language.present? %><span class="badge badge-lang"><%= @movie.language %></span><% end %>
         </div>
-      <% end %>
-      <div class="movie-info">
-        <p><strong>Genre:</strong> <%= @movie.display_genre %></p>
-        <p><strong>Rating:</strong> <%= @movie.rating %></p>
-        <p><strong>Duration:</strong> <%= @movie.duration %> minutes</p>
-        <p><strong>Director:</strong> <%= @movie.director %></p>
       </div>
     </div>
-    
-    <div class="info-section">
-      <h3>Showtime Information</h3>
-      <p><strong>Theater:</strong> <%= @theater.name %></p>
-      <p><strong>Location:</strong> <%= @theater.location %></p>
-      <p><strong>Screen:</strong> <%= @booking.showtime.screen.name %></p>
-      <p><strong>Date:</strong> <%= @booking.showtime.start_time.strftime("%A, %B %d, %Y") %></p>
-      <p><strong>Time:</strong> <%= @booking.showtime.start_time.strftime("%I:%M %p") %></p>
+
+    <div class="ticket-body">
+      <div>
+        <div class="ticket-field-label">Theater</div>
+        <div class="ticket-field-value"><%= @theater.name %></div>
+      </div>
+      <div>
+        <div class="ticket-field-label">Location</div>
+        <div class="ticket-field-value"><%= @theater.location %></div>
+      </div>
+      <div>
+        <div class="ticket-field-label">Screen</div>
+        <div class="ticket-field-value">Screen <%= @showtime.screen.name %></div>
+      </div>
+      <div>
+        <div class="ticket-field-label">Date</div>
+        <div class="ticket-field-value"><%= @showtime.start_time.strftime("%d %b %Y") %></div>
+      </div>
+      <div>
+        <div class="ticket-field-label">Time</div>
+        <div class="ticket-field-value"><%= @showtime.start_time.strftime("%I:%M %p") %></div>
+      </div>
+      <div>
+        <div class="ticket-field-label">Seats</div>
+        <div class="ticket-field-value" style="color:var(--accent);font-weight:800"><%= @booking.seats.join(', ') %></div>
+      </div>
+      <div>
+        <div class="ticket-field-label">Tickets</div>
+        <div class="ticket-field-value"><%= @booking.seats.count %></div>
+      </div>
+      <div>
+        <div class="ticket-field-label">Duration</div>
+        <div class="ticket-field-value"><%= @movie.duration %> mins</div>
+      </div>
     </div>
-    
-    <div class="info-section">
-      <h3>Booking Information</h3>
-      <p><strong>Booking ID:</strong> #<%= @booking.id %></p>
-      <p><strong>Seats:</strong> <%= @booking.seats.join(', ') %></p>
-      <p><strong>Number of Tickets:</strong> <%= @booking.seats.length %></p>
-      <p><strong>Price per Ticket:</strong> ₹<%= @booking.showtime.price %></p>
-      <p><strong>Total Price:</strong> ₹<%= @booking.total_price %></p>
-      <p><strong>Booking Date:</strong> <%= @booking.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+
+    <div class="ticket-footer">
+      <div class="booking-id">
+        Booking ID <span>#<%= @booking.id %></span> &bull;
+        Booked on <%= @booking.created_at.strftime("%d %b %Y") %>
+      </div>
+      <div class="total-amount">₹<%= @booking.total_price %></div>
     </div>
   </div>
-  
-  <div class="booking-actions">
-    <%= link_to "← Back to My Bookings", bookings_path, class: "btn btn-secondary" %>
+
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem">
+    <%= link_to "← My Bookings", bookings_path, class: "btn btn-secondary" %>
     <% if @booking.pending? %>
-      <%= link_to "Cancel Booking", "#", class: "btn btn-danger", data: { confirm: "Are you sure you want to cancel this booking?" } %>
+      <%= button_to "Cancel Booking", cancel_booking_path(@booking),
+            method: :patch,
+            data: { turbo_confirm: "Cancel this booking? This cannot be undone." },
+            class: "btn btn-danger" %>
     <% end %>
     <% if @booking.confirmed? %>
-      <%= link_to "📧 View Confirmation Email", "/letter_opener", class: "btn btn-primary", target: "_blank" %>
+      <%= link_to "Book Again", movie_path(@movie), class: "btn btn-outline" %>
     <% end %>
   </div>
+
 </div>

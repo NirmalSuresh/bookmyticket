@@ -1,45 +1,24 @@
-<h1>Book Tickets for <%= @movie.title if @movie.present? %></h1>
-
-<div class="booking-steps">
-  <div class="step-indicator">
-    <div class="step completed">1. Select City</div>
-    <div class="step completed">2. Select Theater</div>
-    <div class="step completed">3. Select Date</div>
-    <div class="step active">4. Select Time</div>
-  </div>
-  
-  <div class="step-content">
-    <div class="breadcrumb">
-      City: <%= session[:booking_city] %> • 
-      Theater: <%= @theater.name if @theater.present? %> • 
-      Date: <%= Date.parse(session[:booking_date]).strftime('%A, %B %d, %Y') if session[:booking_date].present? %>
-    </div>
-    
-    <h2>Select Showtime</h2>
-    
+<div class="step-content">
+  <h2>Select Showtime</h2>
+  <% if @showtimes.present? && @showtimes.count > 0 %>
     <div class="showtimes-grid">
-      <% if @showtimes.present? && @showtimes.count > 0 %>
-        <% @showtimes.each do |showtime| %>
-          <a href="/movies/<%= @movie.id %>/bookings/new?showtime_id=<%= showtime.id %>" class="showtime-card">
-            <div class="showtime-time"><%= showtime.start_time.strftime('%I:%M %p') %></div>
-            <div class="showtime-screen">Screen <%= showtime.screen.name %></div>
-            <div class="showtime-price">₹<%= showtime.price %></div>
-            <div class="showtime-seats">
-              <%= showtime.available_seats.count %> seats available
-            </div>
-          </a>
-        <% end %>
-      <% else %>
-        <div class="no-showtimes">
-          <h3>No showtimes available</h3>
-          <p>This movie is not showing at this theater on the selected date.</p>
-          <p>Please try a different date or theater.</p>
-          <div class="back-links">
-            <a href="/book/<%= @movie.id %>/date?theater_id=<%= session[:booking_theater_id] %>" class="btn btn-secondary">Try Different Date</a>
-            <a href="/book/<%= @movie.id %>/theater?city=<%= session[:booking_city] %>" class="btn btn-secondary">Try Different Theater</a>
-          </div>
-        </div>
+      <% @showtimes.each do |showtime| %>
+        <a href="/movies/<%= @movie.id %>/bookings/new?showtime_id=<%= showtime.id %>" class="showtime-card">
+          <div class="showtime-time"><%= showtime.start_time.strftime('%I:%M %p') %></div>
+          <div class="showtime-screen">Screen <%= showtime.screen.name %></div>
+          <div class="showtime-price">₹<%= showtime.price %></div>
+          <div class="showtime-seats"><%= showtime.available_seats.count %> seats left</div>
+        </a>
       <% end %>
     </div>
-  </div>
+  <% else %>
+    <div class="empty-state">
+      <h3>No showtimes available</h3>
+      <p>Try a different date or theater.</p>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin-top:1rem">
+        <%= link_to "← Different Date", "/book/#{@movie.id}/date?theater_id=#{session[:booking_theater_id]}", class: "btn btn-secondary" %>
+        <%= link_to "← Different Theater", "/book/#{@movie.id}/theater?city=#{session[:booking_city]}", class: "btn btn-secondary" %>
+      </div>
+    </div>
+  <% end %>
 </div>

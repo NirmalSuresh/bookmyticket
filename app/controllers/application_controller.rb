@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
       'devise/session'
     else
       'application'
+    end
   end
 
   def set_city
@@ -60,24 +61,17 @@ class ApplicationController < ActionController::Base
   private
 
   def set_location_context
-    @available_cities = Showtime.joins(:theater)
-                                .where('showtimes.start_time > ?', Time.current)
-                                .where.not(theaters: { city: [nil, ""] })
-                                .distinct
-                                .order('theaters.city')
-                                .pluck('theaters.city')
-
-    if @available_cities.empty?
-      @available_cities = Theater.where.not(city: [nil, ""]).distinct.order(:city).pluck(:city)
-    end
-
-    chosen_city = session[:current_city]
-    if chosen_city.blank? || !@available_cities.include?(chosen_city)
-      chosen_city = @available_cities.first
-      session[:current_city] = chosen_city
-    end
-
-    @current_city = chosen_city
+    # Pull all cities from DB, normalize duplicates (e.g. Bangalore/Bengaluru → Bengaluru)
+    raw_cities = Theater.distinct.pluck(:city).compact.reject(&:empty?).sort
+    # Normalize: prefer "Bengaluru" over "Bangalore", "Delhi" over "Delhi-NCR"
+    city_aliases = { "Bangalore" => "Bengaluru", "Delhi-NCR" => "Delhi" }
+    @available_cities = raw_cities
+      .map { |c| city_aliases[c] || c }
+      .uniq
+      .sort
+    # Fallback if DB is empty
+    @available_cities = %w[Mumbai Delhi Bengaluru Hyderabad Chennai Kolkata Pune Ahmedabad] if @available_cities.empty?
+    @current_city = session[:current_city] || 'Mumbai'
   end
 
   def current_city

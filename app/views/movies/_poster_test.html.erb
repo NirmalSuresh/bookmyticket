@@ -1,0 +1,11 @@
+<div class="movie-poster">
+  <% fallback_poster = asset_path('fallback-poster.svg') %>
+  <% poster_src = movie.poster_image_url.presence || fallback_poster %>
+  <img 
+    alt="<%= movie.title %>" 
+    class="poster-image" 
+    src="<%= poster_src %>"
+    onerror="this.onerror=null;this.src='<%= fallback_poster %>'"
+    loading="lazy"
+  />
+</div>

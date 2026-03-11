@@ -1,319 +1,193 @@
-<h1>Complete Payment</h1>
-
-<% if @booking.confirmed? %>
-  <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-    <strong>✅ Ticket Confirmed!</strong><br>
-    <small>Check below for your confirmation details or 
-      <a href="/letter_opener" target="_blank" style="color: #155724; text-decoration: underline; font-weight: bold;">
-        view full email
-      </a>
-    </small>
-  </div>
-  
-  <!-- Inline Email Preview -->
-  <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-    <h3 style="color: #e31e24; margin-bottom: 1rem;">🎫 Booking Confirmation</h3>
-    <div style="border-bottom: 2px solid #e31e24; padding-bottom: 1rem; margin-bottom: 1rem;">
-      <h2 style="color: #1a1a1a; margin: 0;"><%= @movie.title %></h2>
-      <p style="color: #666; margin: 0.5rem 0;">Booking ID: #<%= @booking.id %></p>
-    </div>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1rem;">
-      <div>
-        <h4 style="color: #e31e24; margin-bottom: 0.5rem;">🎬 Movie Details</h4>
-        <p style="margin: 0.25rem 0;"><strong>Title:</strong> <%= @movie.title %></p>
-        <p style="margin: 0.25rem 0;"><strong>Language:</strong> <%= @movie.language %></p>
-        <p style="margin: 0.25rem 0;"><strong>Rating:</strong> <%= @movie.rating %></p>
-        <p style="margin: 0.25rem 0;"><strong>Duration:</strong> <%= @movie.duration %> mins</p>
-      </div>
-      
-      <div>
-        <h4 style="color: #e31e24; margin-bottom: 0.5rem;">🏢 Showtime Details</h4>
-        <p style="margin: 0.25rem 0;"><strong>Theater:</strong> <%= @theater.name %></p>
-        <p style="margin: 0.25rem 0;"><strong>Screen:</strong> <%= @showtime.screen.name %></p>
-        <p style="margin: 0.25rem 0;"><strong>Date:</strong> <%= @showtime.start_time.strftime("%A, %B %d, %Y") %></p>
-        <p style="margin: 0.25rem 0;"><strong>Time:</strong> <%= @showtime.start_time.strftime("%I:%M %p") %></p>
-      </div>
-    </div>
-    
-    <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
-      <h4 style="color: #e31e24; margin-bottom: 0.5rem;">🪑 Booking Information</h4>
-      <p style="margin: 0.25rem 0;"><strong>Seats:</strong> <span style="color: #e31e24; font-weight: bold;"><%= @booking.seats.join(', ') %></span></p>
-      <p style="margin: 0.25rem 0;"><strong>Number of Tickets:</strong> <%= @booking.seats.count %></p>
-      <p style="margin: 0.25rem 0;"><strong>Price per Ticket:</strong> ₹<%= @showtime.price %></p>
-      <p style="margin: 0.25rem 0;"><strong>Total Amount:</strong> <span style="color: #28a745; font-weight: bold; font-size: 1.2rem;">₹<%= @booking.total_price %></span></p>
-    </div>
-    
-    <div style="text-align: center; padding-top: 1rem; border-top: 1px solid #ddd;">
-      <p style="color: #666; font-size: 0.9rem;">🎭 Thank you for choosing BookMyTicket!</p>
-      <p style="color: #666; font-size: 0.9rem;">Please arrive 15 minutes before the showtime</p>
-    </div>
-  </div>
+<% fallback_poster = asset_path('fallback-poster.svg') %>
+<% content_for :head do %>
+  <meta name="turbo-visit-control" content="reload">
 <% end %>
 
-<div class="payment-container">
-  <div class="booking-summary">
-    <h2>🎫 Booking Summary</h2>
-    
-    <div class="movie-info">
-      <h3><%= @movie.title %></h3>
-      <p><%= @theater.name %> - Screen <%= @showtime.screen.name %></p>
-      <p><%= @showtime.start_time.strftime('%A, %d %B %Y at %I:%M %p') %></p>
-      <p><%= @movie.language %> • <%= @movie.rating %> • <%= @movie.duration %> mins</p>
+<div class="booking-detail-page">
+
+  <% if @booking.confirmed? %>
+    <%# ── CONFIRMED STATE ── %>
+    <div style="text-align:center;padding:3rem 1rem">
+      <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
+      <h1 style="font-size:2rem;font-weight:900;color:var(--text-primary);margin-bottom:0.5rem">Booking Confirmed!</h1>
+      <p style="color:var(--text-muted);margin-bottom:2.5rem">Your tickets are locked in. See you at the movies!</p>
     </div>
-    
-    <div class="seat-info">
-      <h4>🪑 Seats Selected</h4>
-      <p><strong><%= @booking.seats.join(', ') %></strong></p>
-      <p><%= @booking.seats.count %> seat(s)</p>
+
+    <div class="ticket-card" style="max-width:700px;margin:0 auto 2rem">
+      <div class="ticket-header">
+        <%= image_tag(
+          @movie.poster_image_url.presence || fallback_poster,
+          alt: @movie.title,
+          class: "ticket-poster",
+          onerror: "this.onerror=null;this.src='#{fallback_poster}'"
+        ) %>
+        <div class="ticket-movie-info">
+          <h2><%= @movie.title %></h2>
+          <span class="status-badge confirmed" style="margin-top:0.5rem;display:inline-block">✓ Confirmed</span>
+        </div>
+      </div>
+
+      <div class="ticket-body">
+        <div>
+          <div class="ticket-field-label">Theater</div>
+          <div class="ticket-field-value"><%= @theater.name %></div>
+        </div>
+        <div>
+          <div class="ticket-field-label">Date</div>
+          <div class="ticket-field-value"><%= @showtime.start_time.strftime("%d %b %Y") %></div>
+        </div>
+        <div>
+          <div class="ticket-field-label">Time</div>
+          <div class="ticket-field-value"><%= @showtime.start_time.strftime("%I:%M %p") %></div>
+        </div>
+        <div>
+          <div class="ticket-field-label">Screen</div>
+          <div class="ticket-field-value">Screen <%= @showtime.screen.name %></div>
+        </div>
+        <div>
+          <div class="ticket-field-label">Seats</div>
+          <div class="ticket-field-value" style="color:var(--accent);font-weight:800"><%= @booking.seats.join(', ') %></div>
+        </div>
+        <div>
+          <div class="ticket-field-label">Tickets</div>
+          <div class="ticket-field-value"><%= @booking.seats.count %></div>
+        </div>
+      </div>
+
+      <div class="ticket-footer">
+        <div class="booking-id">Booking ID <span>#<%= @booking.id %></span></div>
+        <div class="total-amount">₹<%= @booking.total_price %></div>
+      </div>
     </div>
-    
-    <div class="price-breakdown">
-      <div class="price-row">
-        <span>Price per seat:</span>
-        <span>₹<%= @showtime.price %></span>
-      </div>
-      <div class="price-row">
-        <span>Base amount (<%= @booking.seats.count %> seats):</span>
-        <span>₹<%= (@showtime.price * @booking.seats.count) %></span>
-      </div>
-      <div class="price-row">
-        <span>Convenience fee (2%):</span>
-        <span>₹<%= ((@showtime.price * @booking.seats.count) * 0.02).round(2) %></span>
-      </div>
-      <div class="price-row total">
-        <span>Total Amount:</span>
-        <span>₹<%= @booking.total_price %></span>
-      </div>
+
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <%= link_to "My Bookings", bookings_path, class: "btn btn-primary" %>
+      <%= link_to "Browse More Movies", root_path, class: "btn btn-secondary" %>
     </div>
-  </div>
-  
-  <div class="payment-form">
-    <% if @booking.confirmed? %>
-      <h2>🎉 Booking Confirmed</h2>
-      <div class="payment-actions">
-        <div style="text-align: center; padding: 2rem;">
-          <h3 style="color: #28a745; margin-bottom: 1rem;">✅ Payment Completed</h3>
-          <p style="color: #666; margin-bottom: 1.5rem;">Your ticket is confirmed. Payment options are now closed for this booking.</p>
-          <%= link_to "🎫 View My Bookings", bookings_path, class: "btn btn-primary", style: "background: linear-gradient(135deg, #28a745 0%, #34ce57 100%); padding: 1rem 2rem; text-decoration: none; color: white; border-radius: 25px; font-weight: 600;" %>
+
+  <% else %>
+    <%# ── PAYMENT STATE ── %>
+    <div class="breadcrumb">
+      <%= link_to "Movies", root_path %> <span class="breadcrumb-sep">›</span>
+      <%= link_to @movie.title, movie_path(@movie) %> <span class="breadcrumb-sep">›</span>
+      Payment
+    </div>
+
+    <h1 style="font-size:1.8rem;font-weight:900;margin-bottom:2rem">Complete Payment</h1>
+
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start">
+
+      <%# Left — Payment Method %>
+      <div>
+        <div class="step-content" style="margin-bottom:1.5rem">
+          <h2>Order Summary</h2>
+
+          <div style="display:flex;gap:1.25rem;align-items:flex-start;margin-bottom:1.5rem">
+            <%= image_tag(
+              @movie.poster_image_url.presence || fallback_poster,
+              alt: @movie.title,
+              style: "width:80px;height:120px;object-fit:cover;border-radius:8px;flex-shrink:0",
+              onerror: "this.onerror=null;this.src='#{fallback_poster}'"
+            ) %>
+            <div>
+              <div style="font-size:1.1rem;font-weight:800;margin-bottom:0.4rem"><%= @movie.title %></div>
+              <div style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.25rem"><%= @theater.name %></div>
+              <div style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.25rem">
+                <%= @showtime.start_time.strftime("%d %b %Y · %I:%M %p") %> · Screen <%= @showtime.screen.name %>
+              </div>
+              <div style="color:var(--accent);font-weight:700;margin-top:0.5rem">
+                Seats: <%= @booking.seats.join(', ') %>
+              </div>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid var(--border);padding-top:1rem">
+            <div class="summary-detail-row">
+              <span class="label">Price per seat</span>
+              <span class="value">₹<%= @showtime.price %></span>
+            </div>
+            <div class="summary-detail-row">
+              <span class="label"><%= @booking.seats.count %> seat(s)</span>
+              <span class="value">₹<%= @showtime.price * @booking.seats.count %></span>
+            </div>
+            <div class="summary-detail-row">
+              <span class="label">Convenience fee (2%)</span>
+              <span class="value">₹<%= ((@showtime.price * @booking.seats.count) * 0.02).round(2) %></span>
+            </div>
+            <hr class="summary-divider">
+            <div class="summary-total">
+              <span>Total</span>
+              <span class="total-value">₹<%= @booking.total_price %></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-content">
+          <h2>Payment Method</h2>
+          <div style="border:2px solid var(--accent);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;background:var(--accent-glow)">
+            <div style="display:flex;align-items:center;gap:0.75rem">
+              <input type="radio" checked style="accent-color:var(--accent)">
+              <div>
+                <div style="font-weight:700;color:var(--text-primary)">🎭 Demo Payment</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem">Test mode — no real charges</div>
+              </div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;opacity:0.5">
+            <div style="display:flex;align-items:center;gap:0.75rem">
+              <input type="radio" disabled>
+              <div>
+                <div style="font-weight:700;color:var(--text-primary)">💳 Razorpay — UPI / Card / Net Banking</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem">Coming soon</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    <% else %>
-      <h2>💳 Payment Details</h2>
 
-      <div class="payment-methods">
-        <h3>Select Payment Method</h3>
-
-        <div class="payment-option active">
-          <div class="payment-header">
-            <input type="radio" name="payment_method" value="demo" checked>
-            <label for="demo">
-              <span>🎭 Demo Payment (For Testing)</span>
-            </label>
+      <%# Right — Pay button sticky sidebar %>
+      <div style="position:sticky;top:calc(var(--nav-height) + 1rem)">
+        <div class="booking-summary-card">
+          <h3>Pay Now</h3>
+          <div style="font-size:2rem;font-weight:900;color:var(--accent);text-align:center;margin:1rem 0">
+            ₹<%= @booking.total_price %>
           </div>
-          <div class="payment-details">
-            <p>This is a demo payment mode for testing purposes.</p>
-            <p>Click "Pay Now" to simulate a successful payment and receive booking confirmation email.</p>
+          <div style="font-size:0.8rem;color:var(--text-muted);text-align:center;margin-bottom:1.5rem">
+            <%= @booking.seats.count %> ticket<%= @booking.seats.count > 1 ? 's' : '' %> · <%= @booking.seats.join(', ') %>
           </div>
-        </div>
 
-        <div class="payment-option">
-          <div class="payment-header">
-            <input type="radio" name="payment_method" value="razorpay" disabled>
-            <label for="razorpay">
-              <span>💳 Razorpay (Coming Soon)</span>
-            </label>
+          <%= form_with url: payment_success_movie_booking_path(@movie, @booking), method: :post, local: true, html: { id: "pay-form" } do |f| %>
+            <button type="submit" class="btn btn-primary btn-large" style="width:100%" id="pay-btn">
+              Pay ₹<%= @booking.total_price %>
+            </button>
+          <% end %>
+
+          <div style="text-align:center;margin-top:1rem;font-size:0.75rem;color:var(--text-subtle)">
+            🔒 Secure demo payment · No real charges
           </div>
-          <div class="payment-details">
-            <p>Credit/Debit Card, UPI, Net Banking, Wallet</p>
-            <p><em>Real payment integration coming soon!</em></p>
-          </div>
-        </div>
-      </div>
 
-      <div class="payment-actions">
-        <%= form_with url: payment_success_movie_booking_path(@movie, @booking), method: :get, local: true do %>
-          <button type="submit"
-                  class="btn btn-primary btn-large"
-                  data-turbo-confirm="Are you sure you want to proceed with the payment of ₹<%= @booking.total_price %>?"
-                  onclick="this.style.display='none'; document.getElementById('processing').style.display='block';">
-            💳 Pay ₹<%= @booking.total_price %>
-          </button>
-        <% end %>
+          <hr class="summary-divider" style="margin:1.25rem 0">
 
-        <div id="processing" style="display: none; text-align: center; margin-top: 20px;">
-          <p>⏳ Processing payment...</p>
-          <p>Please wait while we confirm your booking.</p>
-        </div>
-
-        <div class="security-info">
-          <p>🔒 Secure payment simulation</p>
-          <p>Demo mode - No actual charges will be made</p>
+          <%= button_to "Cancel Booking", cancel_booking_path(@booking),
+                method: :patch,
+                data: { turbo_confirm: "Cancel this booking? This cannot be undone." },
+                class: "btn btn-secondary",
+                style: "width:100%;margin-top:0" %>
         </div>
       </div>
-    <% end %>
-  </div>
+
+    </div>
+  <% end %>
+
 </div>
 
-<style>
-.payment-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
+<script>
+var form = document.getElementById('pay-form');
+var btn = document.getElementById('pay-btn');
+if (form && btn) {
+  form.addEventListener('submit', function() {
+    btn.textContent = '⏳ Processing...';
+    btn.disabled = true;
+  });
 }
-
-.booking-summary, .payment-form {
-  background: white;
-  border-radius: 10px;
-  padding: 30px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.movie-info {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.movie-info h3 {
-  margin: 0 0 10px 0;
-  color: #333;
-}
-
-.movie-info p {
-  margin: 5px 0;
-  color: #666;
-}
-
-.seat-info {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.seat-info h4 {
-  margin: 0 0 10px 0;
-  color: #333;
-}
-
-.seat-info p {
-  margin: 5px 0;
-  color: #666;
-}
-
-.price-breakdown {
-  margin-top: 20px;
-}
-
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.price-row.total {
-  font-weight: bold;
-  font-size: 18px;
-  color: #28a745;
-  border-bottom: none;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 2px solid #eee;
-}
-
-.payment-methods {
-  margin-bottom: 30px;
-}
-
-.payment-option {
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  transition: border-color 0.3s ease;
-}
-
-.payment-option.active {
-  border-color: #764ba2;
-}
-
-.payment-header {
-  display: flex;
-  align-items: center;
-  padding: 15px;
-}
-
-.payment-header input[type="radio"] {
-  margin-right: 15px;
-}
-
-.payment-header label {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin: 0;
-  cursor: pointer;
-}
-
-.payment-details {
-  padding: 0 15px 15px 15px;
-  color: #666;
-  font-size: 14px;
-}
-
-.payment-actions {
-  text-align: center;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  color: white;
-  text-decoration: none;
-}
-
-.btn-large {
-  width: 100%;
-  max-width: 300px;
-}
-
-.security-info {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.security-info p {
-  margin: 5px 0;
-  color: #666;
-  font-size: 14px;
-}
-
-@media (max-width: 768px) {
-  .payment-container {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .booking-summary, .payment-form {
-    padding: 20px;
-  }
-}
-</style>
+</script>
